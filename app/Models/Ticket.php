@@ -10,14 +10,13 @@ class Ticket extends Model
         'ticket_order_id',
         'ticket_type_id',
         'kode_tiket',
-        'qr_code',
         'status',
         'checked_in_at',
-        'checked_in_by'
+        'checked_in_by',
     ];
 
     protected $casts = [
-        'checked_in_at' => 'datetime'
+        'checked_in_at' => 'datetime',
     ];
 
     public function ticketOrder()
