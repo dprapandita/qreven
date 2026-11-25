@@ -22,7 +22,7 @@ class RegisterController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'confirmed', Password::min(8)],
+            'password' => ['required', 'string', Password::min(1)],
         ]);
 
         $user = User::create($data);
@@ -31,6 +31,6 @@ class RegisterController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard');
+        return redirect('/dashboard');
     }
 }

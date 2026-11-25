@@ -112,13 +112,12 @@
                     </span>
                 </a>
 
-                <!-- Nav: EVENTS, BOOTHS, TIKET, RUNDOWN, CHECK-IN -->
+                <!-- Nav: EVENTS, BOOTHS, TIKET, RUNDOWN -->
                 <nav class="hidden md:flex items-center gap-8 text-xs font-bold tracking-widest uppercase text-qr-muted">
-                    <a href="{{ route('events') }}" class="hover:text-qr-accent transition-colors duration-200">EVENTS</a>
-                    <a href="{{ route('booths') }}" class="hover:text-qr-accent transition-colors duration-200">BOOTHS</a>
-                    <a href="{{ route('tickets') }}" class="hover:text-qr-accent transition-colors duration-200">TIKET</a>
-                    <a href="{{ route('rundown') }}" class="hover:text-qr-accent transition-colors duration-200">RUNDOWN</a>
-                    <a href="{{ route('checkin') }}" class="hover:text-qr-accent transition-colors duration-200">CHECK-IN</a>
+                    <a href="{{ route('events.index') }}" class="hover:text-qr-accent transition-colors duration-200">EVENTS</a>
+{{--                    <a href="{{ route('booths.index') }}" class="hover:text-qr-accent transition-colors duration-200">BOOTHS</a>--}}
+{{--                    <a href="{{ route('ticket-types.index') }}" class="hover:text-qr-accent transition-colors duration-200">TIKET</a>--}}
+{{--                    <a href="{{ route('rundowns.index') }}" class="hover:text-qr-accent transition-colors duration-200">RUNDOWN</a>--}}
                 </nav>
 
                 <!-- Right: LOGIN button with accent border -->
@@ -165,11 +164,11 @@
             <!-- Mobile Navigation Drawer -->
             <div id="mobile-menu" class="hidden md:hidden border-b border-qr-border bg-qr-surface/95 backdrop-blur-lg px-6 py-5">
                 <nav class="flex flex-col gap-4 text-xs font-bold tracking-widest uppercase text-qr-muted">
-                    <a href="{{ route('events') }}" class="hover:text-qr-accent transition-colors py-2 border-b border-qr-border/40">EVENTS</a>
-                    <a href="{{ route('booths') }}" class="hover:text-qr-accent transition-colors py-2 border-b border-qr-border/40">BOOTHS</a>
-                    <a href="{{ route('tickets') }}" class="hover:text-qr-accent transition-colors py-2 border-b border-qr-border/40">TIKET</a>
-                    <a href="{{ route('rundown') }}" class="hover:text-qr-accent transition-colors py-2 border-b border-qr-border/40">RUNDOWN</a>
-                    <a href="{{ route('checkin') }}" class="hover:text-qr-accent transition-colors py-2">CHECK-IN</a>
+                    <a href="{{ route('events.index') }}" class="hover:text-qr-accent transition-colors py-2 border-b border-qr-border/40">EVENTS</a>
+{{--                    <a href="{{ route('booths') }}" class="hover:text-qr-accent transition-colors py-2 border-b border-qr-border/40">BOOTHS</a>--}}
+{{--                    <a href="{{ route('tickets') }}" class="hover:text-qr-accent transition-colors py-2 border-b border-qr-border/40">TIKET</a>--}}
+{{--                    <a href="{{ route('rundown') }}" class="hover:text-qr-accent transition-colors py-2 border-b border-qr-border/40">RUNDOWN</a>--}}
+{{--                    <a href="{{ route('checkin') }}" class="hover:text-qr-accent transition-colors py-2">CHECK-IN</a>--}}
                 </nav>
             </div>
         </header>
@@ -211,7 +210,7 @@
                     <!-- CTA Button: "GO TO EVENTS →" (accent outline) -->
                     <div class="animate-fade-in-up anim-delay-300 mt-10 flex items-center justify-center">
                         <a
-                            href="{{ route('events') }}"
+                            href="{{ route('events.index') }}"
                             class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full border-2 border-qr-accent text-qr-accent bg-transparent hover:bg-qr-accent hover:text-white hover:shadow-[0_0_30px_rgba(139,92,246,0.45)] transition-all duration-300 font-bold uppercase tracking-wider text-xs sm:text-sm group"
                         >
                             <span>GO TO EVENTS</span>
@@ -265,10 +264,10 @@
                                 </p>
                             </div>
 
-                            <a href="{{ route('tickets') }}" class="mt-8 pt-6 border-t border-qr-border/60 flex items-center justify-between">
-                                <span class="text-xs font-bold tracking-wider uppercase text-qr-accent group-hover:underline">Explore Passes</span>
-                                <span class="text-qr-accent transition-transform group-hover:translate-x-1 duration-200">→</span>
-                            </a>
+{{--                            <a href="{{ route('tickets') }}" class="mt-8 pt-6 border-t border-qr-border/60 flex items-center justify-between">--}}
+{{--                                <span class="text-xs font-bold tracking-wider uppercase text-qr-accent group-hover:underline">Explore Passes</span>--}}
+{{--                                <span class="text-qr-accent transition-transform group-hover:translate-x-1 duration-200">→</span>--}}
+{{--                            </a>--}}
                         </div>
 
                         <!-- Card 2: 🏪 Booth Rental -->
@@ -289,10 +288,10 @@
                                 </p>
                             </div>
 
-                            <a href="{{ route('booths') }}" class="mt-8 pt-6 border-t border-qr-border/60 flex items-center justify-between">
-                                <span class="text-xs font-bold tracking-wider uppercase text-qr-accent group-hover:underline">Reserve Booth</span>
-                                <span class="text-qr-accent transition-transform group-hover:translate-x-1 duration-200">→</span>
-                            </a>
+{{--                            <a href="{{ route('booths') }}" class="mt-8 pt-6 border-t border-qr-border/60 flex items-center justify-between">--}}
+{{--                                <span class="text-xs font-bold tracking-wider uppercase text-qr-accent group-hover:underline">Reserve Booth</span>--}}
+{{--                                <span class="text-qr-accent transition-transform group-hover:translate-x-1 duration-200">→</span>--}}
+{{--                            </a>--}}
                         </div>
 
                         <!-- Card 3: 📋 Rundown -->
@@ -313,10 +312,10 @@
                                 </p>
                             </div>
 
-                            <a href="{{ route('rundown') }}" class="mt-8 pt-6 border-t border-qr-border/60 flex items-center justify-between">
-                                <span class="text-xs font-bold tracking-wider uppercase text-qr-accent group-hover:underline">View Timetable</span>
-                                <span class="text-qr-accent transition-transform group-hover:translate-x-1 duration-200">→</span>
-                            </a>
+{{--                            <a href="{{ route('rundown') }}" class="mt-8 pt-6 border-t border-qr-border/60 flex items-center justify-between">--}}
+{{--                                <span class="text-xs font-bold tracking-wider uppercase text-qr-accent group-hover:underline">View Timetable</span>--}}
+{{--                                <span class="text-qr-accent transition-transform group-hover:translate-x-1 duration-200">→</span>--}}
+{{--                            </a>--}}
                         </div>
                     </div>
                 </div>
@@ -349,13 +348,13 @@
 
                             <!-- "GO TO EVENTS ↗" Link -->
                             <div class="mt-10">
-                                <a
-                                    href="{{ route('events') }}"
-                                    class="inline-flex items-center justify-center gap-2.5 px-9 py-4 rounded-full bg-qr-accent hover:bg-qr-accent-dark text-white font-bold uppercase tracking-wider text-xs sm:text-sm shadow-[0_0_25px_rgba(139,92,246,0.45)] hover:shadow-[0_0_40px_rgba(139,92,246,0.7)] transition-all duration-300 group"
-                                >
-                                    <span>GO TO EVENTS</span>
-                                    <span class="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-base">↗</span>
-                                </a>
+{{--                                <a--}}
+{{--                                    href="{{ route('events') }}"--}}
+{{--                                    class="inline-flex items-center justify-center gap-2.5 px-9 py-4 rounded-full bg-qr-accent hover:bg-qr-accent-dark text-white font-bold uppercase tracking-wider text-xs sm:text-sm shadow-[0_0_25px_rgba(139,92,246,0.45)] hover:shadow-[0_0_40px_rgba(139,92,246,0.7)] transition-all duration-300 group"--}}
+{{--                                >--}}
+{{--                                    <span>GO TO EVENTS</span>--}}
+{{--                                    <span class="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-base">↗</span>--}}
+{{--                                </a>--}}
                             </div>
                         </div>
                     </div>
