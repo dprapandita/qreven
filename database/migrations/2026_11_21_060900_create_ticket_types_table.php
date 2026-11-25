@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('ticket_types', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('event_id')->constrained()->cascadeOnDelete();
+            $table->string('nama_tiket');
+            $table->decimal('harga', 12, 2)->default(0);
+            $table->unsignedInteger('kuota')->default(0);
             $table->timestamps();
         });
     }

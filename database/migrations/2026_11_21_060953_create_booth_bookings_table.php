@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('booth_bookings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('booth_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('status')->default('menunggu');
+            $table->text('catatan')->nullable();
             $table->timestamps();
         });
     }

@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('booths', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('event_id')->constrained()->cascadeOnDelete();
+            $table->string('nama_booth');
+            $table->text('deskripsi')->nullable();
+            $table->decimal('harga', 12, 2)->default(0);
+            $table->string('status')->default('tersedia');
             $table->timestamps();
         });
     }

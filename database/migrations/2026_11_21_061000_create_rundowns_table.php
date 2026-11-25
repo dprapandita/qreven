@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('rundowns', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('event_id')->constrained()->cascadeOnDelete();
+            $table->string('nama_kegiatan');
+            $table->dateTime('waktu_mulai');
+            $table->dateTime('waktu_selesai');
+            $table->text('deskripsi')->nullable();
             $table->timestamps();
         });
     }

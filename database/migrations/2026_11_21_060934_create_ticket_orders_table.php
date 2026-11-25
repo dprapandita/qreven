@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('ticket_orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('event_id')->constrained()->cascadeOnDelete();
+            $table->decimal('total_harga', 12, 2)->default(0);
+            $table->string('status_pembayaran')->default('pending');
+            $table->string('metode_pembayaran')->nullable();
             $table->timestamps();
         });
     }

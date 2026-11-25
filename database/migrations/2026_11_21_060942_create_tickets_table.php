@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('ticket_order_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('ticket_type_id')->constrained()->cascadeOnDelete();
+            $table->string('kode_tiket')->unique();
+            $table->string('status')->default('belum_checkin');
+            $table->timestamp('checked_in_at')->nullable();
+            $table->foreignId('checked_in_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
