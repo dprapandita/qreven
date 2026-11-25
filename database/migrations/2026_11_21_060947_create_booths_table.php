@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('booths', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('event_id')->constrained()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('event_id')->constrained()->cascadeOnDelete();
             $table->string('nama_booth');
             $table->text('deskripsi')->nullable();
             $table->decimal('harga', 12, 2)->default(0);

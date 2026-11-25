@@ -6,7 +6,10 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -15,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasUuids, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -30,17 +33,22 @@ class User extends Authenticatable
         ];
     }
 
-    public function events()
+    public function events(): HasMany
     {
         return $this->hasMany(Event::class);
     }
 
-    public function ticketOrders()
+    public function eventMemberships(): BelongsToMany
+    {
+        return $this->belongsToMany(Event::class)->withPivot('role')->withTimestamps();
+    }
+
+    public function ticketOrders(): HasMany
     {
         return $this->hasMany(TicketOrder::class);
     }
 
-    public function boothBookings()
+    public function boothBookings(): HasMany
     {
         return $this->hasMany(BoothBooking::class);
     }

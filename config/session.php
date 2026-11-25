@@ -156,7 +156,15 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => env('SESSION_DOMAIN') ?: (function (): ?string {
+        $baseDomain = env('APP_BASE_DOMAIN') ?: (parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST) ?: 'localhost');
+
+        if (filter_var($baseDomain, FILTER_VALIDATE_IP)) {
+            return null;
+        }
+
+        return $baseDomain === 'localhost' ? 'localhost' : '.'.$baseDomain;
+    })(),
 
     /*
     |--------------------------------------------------------------------------
