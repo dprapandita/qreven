@@ -1,0 +1,36 @@
+# Git dan file editor
+.git
+.gitignore
+.github
+.idea
+.vscode
+.cursor
+.codex
+.DS_Store
+Thumbs.db
+
+# Konfigurasi lokal dan kredensial
+.env*
+!.env.example
+auth.json
+*.pem
+*.key
+
+# Dependensi dan hasil build dibuat ulang di dalam image
+vendor
+node_modules
+public/build
+public/hot
+public/storage
+
+# Data dan cache runtime
+storage/**
+bootstrap/cache/*.php
+database/*.sqlite
+database/*.sqlite-*
+*.log
+.phpunit.result.cache
+.phpunit.cache
+
+# Berkas pengembangan lokal
+_ide_helper.php
