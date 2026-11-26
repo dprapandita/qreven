@@ -8,23 +8,29 @@ use App\Enums\EventStatus;
 use App\Models\Booth;
 use App\Models\BoothBooking;
 use App\Models\Event;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 class BoothBookingController extends Controller
 {
-    public function index(Event $event): Collection
+    public function index(Request $request, Event $event): View|JsonResponse
     {
-        $this->authorizeEventAccess($event, 'viewOrders');
+        $this->authorizeEventAccess($event, 'orders');
 
-        return BoothBooking::query()
+        $bookings = BoothBooking::query()
             ->whereHas('booth', fn ($query) => $query->where('event_id', $event->id))
-            ->with(['user', 'booth'])
+            ->with(['user', 'booth.event'])
             ->latest()
             ->get();
+
+        if ($request->expectsJson()) {
+            return response()->json($bookings);
+        }
+
+        return view('booth-bookings.index', compact('bookings', 'event'));
     }
 
     public function store(Request $request): JsonResponse
@@ -71,16 +77,97 @@ class BoothBookingController extends Controller
         ], 201);
     }
 
+    public function update(Request $request): RedirectResponse
+    {
+        $booking = $request->route('booking');
+
+        $model = BoothBooking::query()->with('booth.event')->findOrFail($booking);
+        $event = $model->booth->event;
+
+        abort_if($event === null, 404);
+
+        $this->authorizeEventAccess($event, 'manage');
+
+        $status = $request->validate([
+            'status' => ['required', 'in:disetujui,ditolak'],
+        ])['status'];
+
+        if ($status === BoothBookingStatus::Approved->value) {
+            $this->approveBooking($event, $booking);
+            $message = 'Pemesanan booth disetujui';
+        } else {
+            $this->rejectBooking($event, $booking);
+            $message = 'Pemesanan booth ditolak';
+        }
+
+        return redirect()->route('booth-bookings.index', $event)->with('success', $message);
+    }
+
     public function approve(Event $event, string $booking): JsonResponse
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
 
+        $this->approveBooking($event, $booking);
+
+        return response()->json([
+            'message' => 'Pemesanan booth disetujui',
+            'data' => BoothBooking::query()->whereKey($booking)->firstOrFail(),
+        ]);
+    }
+
+    public function reject(Event $event, string $booking): JsonResponse
+    {
+        $this->authorizeEventAccess($event, 'manage');
+
+        $this->rejectBooking($event, $booking);
+
+        return response()->json([
+            'message' => 'Pemesanan booth ditolak',
+            'data' => BoothBooking::query()->whereKey($booking)->firstOrFail(),
+        ]);
+    }
+
+    public function cancelByManager(Event $event, string $booking): JsonResponse
+    {
+        $this->authorizeEventAccess($event, 'manage');
+
+        $this->cancelBooking($event, $booking);
+
+        return response()->json([
+            'message' => 'Pemesanan booth dibatalkan',
+        ]);
+    }
+
+    public function cancelOwn(Request $request): JsonResponse
+    {
+        $event = $this->resolveEvent($request);
+        $booking = $request->route('booking');
+
+        $model = BoothBooking::query()
+            ->whereKey($booking)
+            ->whereHas('booth', fn ($query) => $query->where('event_id', $event->id))
+            ->firstOrFail();
+
+        abort_unless(
+            $model->user_id === auth()->id() || $event->canManageOrdersBy(auth()->user()),
+            403,
+        );
+
+        $this->cancelBooking($event, $booking);
+
+        return response()->json([
+            'message' => 'Pemesanan booth dibatalkan',
+        ]);
+    }
+
+    private function approveBooking(Event $event, string $booking): void
+    {
         DB::transaction(function () use ($event, $booking): void {
-            $booking = $this->lockBooking($event, $booking);
+            $model = $this->lockBooking($event, $booking);
 
-            abort_if($booking->status !== BoothBookingStatus::Pending, 422, 'Pemesanan tidak dapat disetujui.');
+            abort_if($model->status !== BoothBookingStatus::Pending, 422, 'Pemesanan tidak dapat disetujui.');
 
-            $booth = Booth::query()->whereKey($booking->booth_id)->lockForUpdate()->firstOrFail();
+            $booth = Booth::query()->whereKey($model->booth_id)->lockForUpdate()->firstOrFail();
 
             abort_if($booth->status !== BoothStatus::Available, 422, 'Booth tidak tersedia.');
 
@@ -91,72 +178,39 @@ class BoothBookingController extends Controller
 
             abort_if($otherApproved, 422, 'Booth sudah memiliki pemesanan yang disetujui.');
 
-            $booking->update([
+            $model->update([
                 'status' => BoothBookingStatus::Approved->value,
                 'approved_at' => now(),
             ]);
 
             $booth->update(['status' => BoothStatus::Booked->value]);
         });
-
-        return response()->json([
-            'message' => 'Pemesanan booth disetujui',
-            'data' => BoothBooking::query()->whereKey($booking)->firstOrFail(),
-        ]);
     }
 
-    public function reject(Event $event, string $booking): JsonResponse
+    private function rejectBooking(Event $event, string $booking): void
     {
-        $this->authorizeEventAccess($event, 'update');
-
         DB::transaction(function () use ($event, $booking): void {
-            $booking = $this->lockBooking($event, $booking);
+            $model = $this->lockBooking($event, $booking);
 
-            abort_if($booking->status !== BoothBookingStatus::Pending, 422, 'Pemesanan tidak dapat ditolak.');
+            abort_if($model->status !== BoothBookingStatus::Pending, 422, 'Pemesanan tidak dapat ditolak.');
 
-            $booking->update(['status' => BoothBookingStatus::Rejected->value]);
+            $model->update(['status' => BoothBookingStatus::Rejected->value]);
         });
-
-        return response()->json([
-            'message' => 'Pemesanan booth ditolak',
-            'data' => BoothBooking::query()->whereKey($booking)->firstOrFail(),
-        ]);
     }
 
-    public function cancelByManager(Event $event, string $booking): JsonResponse
-    {
-        $this->authorizeEventAccess($event, 'update');
-
-        return $this->cancelBooking($event, $booking);
-    }
-
-    public function cancelOwn(Request $request, string $booking): JsonResponse
-    {
-        $event = $this->resolveEvent($request);
-
-        $model = BoothBooking::query()
-            ->whereKey($booking)
-            ->whereHas('booth', fn ($query) => $query->where('event_id', $event->id))
-            ->firstOrFail();
-
-        Gate::authorize('cancel', $model);
-
-        return $this->cancelBooking($event, $booking);
-    }
-
-    private function cancelBooking(Event $event, string $booking): JsonResponse
+    private function cancelBooking(Event $event, string $booking): void
     {
         DB::transaction(function () use ($event, $booking): void {
-            $booking = $this->lockBooking($event, $booking);
+            $model = $this->lockBooking($event, $booking);
 
-            abort_unless(in_array($booking->status, [
+            abort_unless(in_array($model->status, [
                 BoothBookingStatus::Pending,
                 BoothBookingStatus::Approved,
             ], true), 422, 'Pemesanan tidak dapat dibatalkan.');
 
-            $wasApproved = $booking->status === BoothBookingStatus::Approved;
+            $wasApproved = $model->status === BoothBookingStatus::Approved;
 
-            $booking->update([
+            $model->update([
                 'status' => BoothBookingStatus::Cancelled->value,
                 'cancelled_at' => now(),
             ]);
@@ -165,7 +219,7 @@ class BoothBookingController extends Controller
                 return;
             }
 
-            $booth = Booth::query()->whereKey($booking->booth_id)->lockForUpdate()->firstOrFail();
+            $booth = Booth::query()->whereKey($model->booth_id)->lockForUpdate()->firstOrFail();
 
             $otherApproved = BoothBooking::query()
                 ->where('booth_id', $booth->id)
@@ -176,10 +230,6 @@ class BoothBookingController extends Controller
                 $booth->update(['status' => BoothStatus::Available->value]);
             }
         });
-
-        return response()->json([
-            'message' => 'Pemesanan booth dibatalkan',
-        ]);
     }
 
     private function lockBooking(Event $event, string $booking): BoothBooking

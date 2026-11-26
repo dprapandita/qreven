@@ -1,116 +1,49 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="id" class="h-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>@yield('title', 'Penyelenggara') - {{ config('app.name', 'Laravel') }}</title>
-
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            background: #f5f5f4;
-            color: #1c1917;
-            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-        }
-        .card {
-            width: 100%;
-            max-width: 26rem;
-            padding: 2rem;
-            background: #ffffff;
-            border: 1px solid #e7e5e4;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.08);
-        }
-        h1 { margin: 0 0 0.5rem; font-size: 1.25rem; }
-        .sub { margin: 0 0 1.5rem; color: #57534e; font-size: 0.875rem; line-height: 1.5; }
-        .error {
-            margin-bottom: 1rem;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            background: #fef2f2;
-            color: #b91c1c;
-            font-size: 0.875rem;
-        }
-        .error ul { margin: 0; padding-left: 1.1rem; }
-        .field { margin-bottom: 1rem; }
-        .field label { display: block; margin-bottom: 0.35rem; font-size: 0.85rem; font-weight: 600; }
-        .field input {
-            width: 100%;
-            padding: 0.6rem 0.75rem;
-            border: 1px solid #d6d3d1;
-            border-radius: 0.5rem;
-            font-size: 0.95rem;
-            font-family: inherit;
-        }
-        .field input:focus { outline: 2px solid #a8a29e; border-color: #a8a29e; }
-        .checkbox {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        .checkbox input { width: auto; }
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            margin-bottom: 0.75rem;
-            padding: 0.7rem 1rem;
-            border: 1px solid #d6d3d1;
-            border-radius: 0.5rem;
-            background: #ffffff;
-            color: #1c1917;
-            font-size: 0.9rem;
-            font-family: inherit;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background 0.15s ease;
-        }
-        .btn:hover { background: #f5f5f4; }
-        .btn.primary, .btn.github { background: #1c1917; border-color: #1c1917; color: #ffffff; }
-        .btn.primary:hover, .btn.github:hover { background: #292524; }
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin: 1.5rem 0 1rem;
-            color: #a8a29e;
-            font-size: 0.8rem;
-        }
-        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #e7e5e4; }
-        .switch { margin: 1rem 0 0; text-align: center; font-size: 0.875rem; color: #57534e; }
-        .switch a { color: #1c1917; font-weight: 600; text-underline-offset: 2px; }
-    </style>
-    @stack('auth-styles')
+    <title>@yield('title', 'Masuk') · {{ config('app.name', 'Qreven') }}</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="@yield('auth-body-class')">
-@yield('auth-brand')
-<main class="card">
-    <h1>@yield('heading')</h1>
-    <p class="sub">@yield('subheading')</p>
+<body class="min-h-full bg-white">
+<div class="grid min-h-screen lg:grid-cols-2">
 
-    @if ($errors->any())
-        <div class="error" role="alert">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+    {{-- Panel kiri: brand --}}
+    <div class="gradient-brand relative hidden overflow-hidden p-12 text-white lg:flex lg:flex-col lg:justify-between">
+        <div class="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-accent-500/30 blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-32 -left-20 size-96 rounded-full bg-brand-400/30 blur-3xl"></div>
+
+        <a href="{{ url('/') }}" class="relative flex items-center gap-3">
+            <span class="grid size-10 place-items-center rounded-xl bg-white/15 ring-1 ring-white/25"><x-icon name="qr" class="size-5" /></span>
+            <span class="text-xl font-extrabold tracking-tight">{{ config('app.name', 'Qreven') }}</span>
+        </a>
+
+        <div class="relative max-w-md">
+            <h2 class="text-4xl font-extrabold leading-tight">Kelola event, tiket, dan booth dalam satu tempat.</h2>
+            <p class="mt-4 text-brand-200">Dari rundown sampai check-in peserta, semuanya rapi dan terpantau lewat satu dashboard.</p>
+            <ul class="mt-8 space-y-3 text-sm text-brand-100">
+                @foreach(['Jenis tiket dan kuota fleksibel', 'Pemesanan booth untuk vendor', 'Check-in cepat dengan kode QR'] as $f)
+                    <li class="flex items-center gap-3"><span class="grid size-6 place-items-center rounded-full bg-white/15"><x-icon name="check" class="size-3.5" /></span>{{ $f }}</li>
                 @endforeach
             </ul>
         </div>
-    @endif
 
-    @yield('content')
-</main>
+        <p class="relative text-xs text-brand-300">© {{ date('Y') }} {{ config('app.name', 'Qreven') }}</p>
+    </div>
+
+    {{-- Panel kanan: form --}}
+    <div class="flex items-center justify-center px-6 py-12">
+        <div class="w-full max-w-md">
+            <a href="{{ url('/') }}" class="mb-8 flex items-center gap-2 lg:hidden">
+                <span class="grid size-9 place-items-center rounded-xl bg-brand-600 text-white"><x-icon name="qr" class="size-5" /></span>
+                <span class="text-lg font-extrabold text-brand-950">{{ config('app.name', 'Qreven') }}</span>
+            </a>
+            @yield('content')
+        </div>
+    </div>
+</div>
 </body>
 </html>

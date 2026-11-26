@@ -1,151 +1,46 @@
 @extends('layouts.auth')
-
-@section('title', 'Masuk Penyelenggara')
-@section('heading', 'Masuk sebagai Penyelenggara')
-@section('subheading', 'Gunakan akun Anda untuk membuka dashboard Qreven.')
-@section('auth-body-class', 'qreven-login')
-
-@section('auth-brand')
-    <aside class="login-brand" aria-label="Qreven">
-        <span class="login-wordmark">Qreven<span>.</span></span>
-        <div class="login-ticket" aria-hidden="true">
-            <div class="login-ticket-art"></div>
-            <div class="login-ticket-stub"><span></span></div>
-        </div>
-        <p>Kelola event, tiket, dan booth dalam satu dashboard.</p>
-    </aside>
-@endsection
-
-@push('auth-styles')
-    <style>
-        .qreven-login {
-            --login-bg: #0b0b14;
-            --login-panel: #14142b;
-            --login-line: #383552;
-            --login-text: #faf8ff;
-            --login-muted: #b5b1cb;
-            --login-accent: #c4b5fd;
-            display: grid;
-            grid-template-columns: minmax(0, 23rem) minmax(0, 30rem);
-            gap: clamp(2rem, 7vw, 7rem);
-            padding: clamp(1.25rem, 4vw, 4rem);
-            background: var(--login-bg);
-            color: var(--login-text);
-            color-scheme: dark;
-        }
-        .qreven-login .login-brand { min-width: 0; }
-        .qreven-login .login-wordmark { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.055em; }
-        .qreven-login .login-wordmark span { color: var(--login-accent); }
-        .qreven-login .login-brand p {
-            max-width: 13em;
-            margin: 0;
-            font-size: clamp(1.65rem, 3vw, 2.65rem);
-            font-weight: 680;
-            line-height: 1.12;
-            letter-spacing: -0.045em;
-            text-wrap: balance;
-        }
-        .qreven-login .login-ticket {
-            display: grid;
-            grid-template-columns: 1fr 25%;
-            height: clamp(8rem, 15vw, 12rem);
-            margin: 2.25rem 0;
-            overflow: hidden;
-            transform: rotate(-7deg);
-            border: 1px solid #9b7fef;
-            border-radius: 1.15rem;
-            background: #29204c;
-            box-shadow: 0 1.4rem 4rem #6d28d94d;
-        }
-        .qreven-login .login-ticket-art {
-            background:
-                radial-gradient(ellipse at 22% 15%, #c4b5fd, transparent 62%),
-                repeating-linear-gradient(135deg, #c4b5fd36 0 1px, transparent 1px 9px),
-                linear-gradient(135deg, #8054ec, #251b4c 82%);
-        }
-        .qreven-login .login-ticket-stub { display: grid; place-items: center; border-left: 1px dashed #a594d1; }
-        .qreven-login .login-ticket-stub span {
-            width: 50%;
-            height: 66%;
-            background: repeating-linear-gradient(0deg, #c4b5fd 0 2px, transparent 2px 4px, #c4b5fd 4px 8px, transparent 8px 13px);
-        }
-        .qreven-login .card {
-            max-width: none;
-            min-width: 0;
-            padding: clamp(1.25rem, 3.8vw, 2.5rem);
-            border-color: var(--login-line);
-            border-radius: 1.4rem;
-            background: var(--login-panel);
-            box-shadow: 0 1.25rem 4rem #0005;
-        }
-        .qreven-login h1 { font-size: clamp(1.5rem, 3.2vw, 2.15rem); line-height: 1.12; letter-spacing: -0.045em; }
-        .qreven-login .sub, .qreven-login .switch, .qreven-login .divider { color: var(--login-muted); }
-        .qreven-login .error { background: #381f37; color: #ffc6d2; }
-        .qreven-login .field input {
-            min-height: 2.9rem;
-            border-color: var(--login-line);
-            background: var(--login-bg);
-            color: var(--login-text);
-            font-size: 1rem;
-        }
-        .qreven-login .checkbox input { accent-color: #a78bfa; }
-        .qreven-login .btn {
-            min-height: 2.9rem;
-            margin: 0;
-            border-color: var(--login-line);
-            background: #201e39;
-            color: var(--login-text);
-        }
-        .qreven-login .btn:hover { background: #2e294a; }
-        .qreven-login .btn.primary { border-color: #a78bfa; background: #a78bfa; color: #160b34; }
-        .qreven-login .btn.primary:hover { background: var(--login-accent); }
-        .qreven-login :is(a, button, input):focus-visible { outline: 2px solid var(--login-accent); outline-offset: 3px; }
-        .qreven-login .divider { margin: 1.25rem 0 0.9rem; }
-        .qreven-login .divider::before, .qreven-login .divider::after { background: var(--login-line); }
-        .qreven-login .login-providers { display: grid; gap: 0.6rem; }
-        .qreven-login .switch { margin-top: 1.35rem; }
-        .qreven-login .switch a { color: var(--login-accent); }
-
-        @media (max-width: 48rem) {
-            .qreven-login { grid-template-columns: minmax(0, 30rem); gap: 1.25rem; align-content: center; }
-            .qreven-login .login-ticket, .qreven-login .login-brand p { display: none; }
-        }
-    </style>
-@endpush
+@section('title', 'Masuk')
 
 @section('content')
-    <form method="POST" action="{{ route('login.store') }}">
-        @csrf
+<h1 class="text-3xl font-extrabold tracking-tight text-brand-950">Selamat datang kembali</h1>
+<p class="mt-2 text-sm text-slate-500">Masuk untuk mengelola event kamu.</p>
 
-        <div class="field">
-            <label for="email">Email</label>
-            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username">
-        </div>
+@if(session('status'))
+    <div class="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('status') }}</div>
+@endif
 
-        <div class="field">
-            <label for="password">Password</label>
-            <input id="password" type="password" name="password" required autocomplete="current-password">
-        </div>
+<form method="POST" action="{{ route('login') }}" class="mt-8 space-y-5">
+    @csrf
+    <x-field name="email" label="Email">
+        <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="username" class="input" placeholder="kamu@email.com">
+    </x-field>
+    <x-field name="password" label="Kata sandi">
+        <input id="password" name="password" type="password" required autocomplete="current-password" class="input" placeholder="••••••••">
+    </x-field>
 
-        <label class="checkbox">
-            <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
-            Ingat saya
-        </label>
+    <label class="flex items-center gap-2 text-sm text-slate-600">
+        <input type="checkbox" name="remember" class="size-4 rounded border-brand-300 text-brand-600 focus:ring-brand-200"> Ingat saya
+    </label>
 
-        <button type="submit" class="btn primary">Masuk</button>
-    </form>
+    <button type="submit" class="btn-primary w-full py-3">Masuk</button>
+</form>
 
-    <div class="divider"><span>atau</span></div>
+<div class="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+    <span class="h-px flex-1 bg-brand-100"></span> atau <span class="h-px flex-1 bg-brand-100"></span>
+</div>
 
-    <div class="login-providers">
-        <a href="{{ route('auth.redirect', ['provider' => 'google']) }}" class="btn">
-            Lanjutkan dengan Google
-        </a>
+<div class="grid grid-cols-2 gap-3">
+    <a href="{{ url('/auth/google/redirect') }}" class="btn-secondary">
+        <svg class="size-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M23 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7c2.2-2 3.4-5 3.4-8.4z"/><path fill="#34A853" d="M12 24c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.3 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.8v3A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.6 14.7a7.2 7.2 0 0 1 0-4.6v-3H1.8a12 12 0 0 0 0 10.6z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.2.6 4.4 1.7l3.3-3.3A12 12 0 0 0 1.8 7.1l3.8 3C6.5 6.8 9 4.8 12 4.8z"/></svg>
+        Google
+    </a>
+    <a href="{{ url('/auth/github/redirect') }}" class="btn-secondary">
+        <svg class="size-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        GitHub
+    </a>
+</div>
 
-        <a href="{{ route('auth.redirect', ['provider' => 'github']) }}" class="btn">
-            Lanjutkan dengan GitHub
-        </a>
-    </div>
-
-    <p class="switch">Belum punya akun? <a href="{{ route('register') }}">Daftar</a></p>
+@if(Route::has('register'))
+<p class="mt-8 text-center text-sm text-slate-500">Belum punya akun? <a href="{{ route('register') }}" class="font-bold text-brand-600 hover:text-brand-800">Daftar</a></p>
+@endif
 @endsection

@@ -15,14 +15,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class TicketOrderController extends Controller
 {
     public function index(Event $event): Collection
     {
-        $this->authorizeEventAccess($event, 'viewOrders');
+        $this->authorizeEventAccess($event, 'orders');
 
         return $event->ticketOrders()
             ->with(['items', 'tickets'])
@@ -101,7 +100,7 @@ class TicketOrderController extends Controller
 
     public function pay(Event $event, TicketOrder $order): JsonResponse
     {
-        $this->authorizeEventAccess($event, 'manageOrders');
+        $this->authorizeEventAccess($event, 'orders');
 
         abort_unless($order->event_id === $event->id, 404);
 
@@ -131,23 +130,27 @@ class TicketOrderController extends Controller
 
     public function cancel(Event $event, TicketOrder $order): JsonResponse
     {
-        $this->authorizeEventAccess($event, 'manageOrders');
+        $this->authorizeEventAccess($event, 'orders');
 
         abort_unless($order->event_id === $event->id, 404);
 
         return $this->cancelOrder($order);
     }
 
-    public function cancelOwn(Request $request, string $order): JsonResponse
+    public function cancelOwn(Request $request): JsonResponse
     {
         $event = $this->resolveEvent($request);
+        $orderId = $request->route('order');
 
         $order = TicketOrder::query()
-            ->whereKey($order)
+            ->whereKey($orderId)
             ->where('event_id', $event->id)
             ->firstOrFail();
 
-        Gate::authorize('cancel', $order);
+        abort_unless(
+            $order->user_id === auth()->id() || $event->canManageOrdersBy(auth()->user()),
+            403,
+        );
 
         return $this->cancelOrder($order);
     }

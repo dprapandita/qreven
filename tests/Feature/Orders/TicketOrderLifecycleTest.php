@@ -146,7 +146,7 @@ it('confirms payment for a pending order', function () {
     expect($order->refresh()->paid_at)->not->toBeNull();
 });
 
-it('allows finance members to confirm payment but not administrators', function () {
+it('allows finance and administrator members to confirm payment', function () {
     [$owner, $event, $ticketType] = orderEvent();
     $buyer = User::factory()->create();
     $finance = User::factory()->create();
@@ -161,14 +161,22 @@ it('allows finance members to confirm payment but not administrators', function 
             'jumlah' => 1,
         ]);
 
-    $order = TicketOrder::query()->where('event_id', $event->id)->firstOrFail();
-
-    $this->actingAs($administrator)
-        ->postJson(route('orders.pay', [$event, $order]))
-        ->assertForbidden();
+    $financeOrder = TicketOrder::query()->where('event_id', $event->id)->firstOrFail();
 
     $this->actingAs($finance)
-        ->postJson(route('orders.pay', [$event, $order]))
+        ->postJson(route('orders.pay', [$event, $financeOrder]))
+        ->assertOk();
+
+    $response = $this->actingAs($buyer)
+        ->postJson('http://'.$event->subdomain.'.localhost/orders', [
+            'ticket_type_id' => $ticketType->id,
+            'jumlah' => 1,
+        ]);
+
+    $adminOrder = TicketOrder::query()->findOrFail($response->json('data.id'));
+
+    $this->actingAs($administrator)
+        ->postJson(route('orders.pay', [$event, $adminOrder]))
         ->assertOk();
 });
 

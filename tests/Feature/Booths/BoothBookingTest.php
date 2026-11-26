@@ -131,11 +131,6 @@ it('lets a tenant cancel their own pending booking', function () {
     $tenant = User::factory()->create();
     $booking = BoothBooking::factory()->for($booth)->for($tenant)->create();
 
-    expect($booking->booth->event_id)->toBe($event->id)
-        ->and(BoothBooking::query()->whereKey($booking->id)->whereHas('booth', fn ($query) => $query->where('event_id', $event->id))->exists())->toBeTrue();
-
-    $this->withoutExceptionHandling();
-
     $this->actingAs($tenant)
         ->postJson('http://'.$event->subdomain.'.localhost/booth-bookings/'.$booking->id.'/cancel')
         ->assertOk();

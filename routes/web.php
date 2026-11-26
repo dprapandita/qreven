@@ -65,27 +65,38 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/check-in', [CheckInController::class, 'index'])->name('checkin');
+    Route::post('/check-in', [CheckInController::class, 'verifyForm'])->name('checkin.verify');
+
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
+    Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
     Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
 
     Route::prefix('/events/{event}')->group(function () {
+        Route::get('/ticket-types/create', [TicketTypeController::class, 'create'])->name('ticket-types.create');
+        Route::get('/ticket-types/{ticketType}/edit', [TicketTypeController::class, 'edit'])->name('ticket-types.edit');
         Route::get('/ticket-types', [TicketTypeController::class, 'index'])->name('ticket-types.index');
         Route::post('/ticket-types', [TicketTypeController::class, 'store'])->name('ticket-types.store');
         Route::put('/ticket-types/{ticketType}', [TicketTypeController::class, 'update'])->name('ticket-types.update');
         Route::delete('/ticket-types/{ticketType}', [TicketTypeController::class, 'destroy'])->name('ticket-types.destroy');
 
+        Route::get('/booths/create', [BoothController::class, 'create'])->name('booths.create');
+        Route::get('/booths/{booth}/edit', [BoothController::class, 'edit'])->name('booths.edit');
         Route::get('/booths', [BoothController::class, 'index'])->name('booths.index');
         Route::post('/booths', [BoothController::class, 'store'])->name('booths.store');
         Route::put('/booths/{booth}', [BoothController::class, 'update'])->name('booths.update');
         Route::delete('/booths/{booth}', [BoothController::class, 'destroy'])->name('booths.destroy');
 
+        Route::get('/rundowns/create', [RundownController::class, 'create'])->name('rundowns.create');
+        Route::get('/rundowns/{rundown}/edit', [RundownController::class, 'edit'])->name('rundowns.edit');
         Route::get('/rundowns', [RundownController::class, 'index'])->name('rundowns.index');
         Route::post('/rundowns', [RundownController::class, 'store'])->name('rundowns.store');
         Route::put('/rundowns/{rundown}', [RundownController::class, 'update'])->name('rundowns.update');
@@ -96,6 +107,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/orders/{order}/cancel', [TicketOrderController::class, 'cancel'])->name('orders.cancel');
 
         Route::get('/booth-bookings', [BoothBookingController::class, 'index'])->name('booth-bookings.index');
+        Route::put('/booth-bookings/{booking}', [BoothBookingController::class, 'update'])->name('booth-bookings.update');
         Route::post('/booth-bookings/{booking}/approve', [BoothBookingController::class, 'approve'])->name('booth-bookings.approve');
         Route::post('/booth-bookings/{booking}/reject', [BoothBookingController::class, 'reject'])->name('booth-bookings.reject');
         Route::post('/booth-bookings/{booking}/cancel', [BoothBookingController::class, 'cancelByManager'])->name('booth-bookings.cancel');

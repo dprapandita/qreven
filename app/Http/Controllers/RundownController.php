@@ -3,24 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use App\Models\Rundown;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\View\View;
 
 class RundownController extends Controller
 {
-    public function index(Event $event): Collection
+    public function index(Request $request, Event $event): View|JsonResponse
     {
         $this->authorizeEventAccess($event, 'view');
 
-        return $event->rundowns()->orderBy('waktu_mulai')->get();
+        $rundowns = $event->rundowns()->orderBy('waktu_mulai')->get();
+
+        if ($request->expectsJson()) {
+            return response()->json($rundowns);
+        }
+
+        return view('rundowns.index', compact('event', 'rundowns'));
     }
 
-    public function store(Request $request, Event $event): Rundown
+    public function create(Event $event): View
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
+
+        return view('rundowns.create', compact('event'));
+    }
+
+    public function store(Request $request, Event $event): RedirectResponse
+    {
+        $this->authorizeEventAccess($event, 'manage');
 
         $data = $request->validate([
             'nama_kegiatan' => ['required', 'string', 'max:255'],
@@ -29,12 +42,28 @@ class RundownController extends Controller
             'deskripsi' => ['nullable', 'string'],
         ]);
 
-        return $event->rundowns()->create($data);
+        $event->rundowns()->create($data);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Rundown berhasil ditambahkan'], 201);
+        }
+
+        return redirect()->route('rundowns.index', $event)
+            ->with('success', 'Rundown berhasil ditambahkan');
     }
 
-    public function update(Request $request, Event $event, string $rundown): Rundown
+    public function edit(Event $event, string $rundown): View
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
+
+        $rundown = $event->rundowns()->findOrFail($rundown);
+
+        return view('rundowns.edit', compact('event', 'rundown'));
+    }
+
+    public function update(Request $request, Event $event, string $rundown): RedirectResponse
+    {
+        $this->authorizeEventAccess($event, 'manage');
 
         $rundown = $event->rundowns()->findOrFail($rundown);
 
@@ -52,17 +81,25 @@ class RundownController extends Controller
 
         $rundown->update($data);
 
-        return $rundown;
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Rundown berhasil diperbarui']);
+        }
+
+        return redirect()->route('rundowns.index', $event)
+            ->with('success', 'Rundown berhasil diperbarui');
     }
 
-    public function destroy(Event $event, string $rundown): JsonResponse
+    public function destroy(Request $request, Event $event, string $rundown): RedirectResponse|JsonResponse
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
 
         $event->rundowns()->findOrFail($rundown)->delete();
 
-        return response()->json([
-            'message' => 'Rundown berhasil dihapus',
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Rundown berhasil dihapus']);
+        }
+
+        return redirect()->route('rundowns.index', $event)
+            ->with('success', 'Rundown berhasil dihapus');
     }
 }

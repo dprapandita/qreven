@@ -14,14 +14,14 @@ class EventMemberController extends Controller
 {
     public function index(Event $event): Collection
     {
-        $this->authorizeEventAccess($event, 'manageMembers');
+        $this->authorizeEventAccess($event, 'members');
 
         return $event->members()->orderBy('name')->get();
     }
 
     public function store(Request $request, Event $event): JsonResponse
     {
-        $this->authorizeEventAccess($event, 'manageMembers');
+        $this->authorizeEventAccess($event, 'members');
 
         $data = $request->validate([
             'user_id' => ['required', 'uuid', 'exists:users,id'],
@@ -47,7 +47,7 @@ class EventMemberController extends Controller
 
     public function destroy(Event $event, string $user): JsonResponse
     {
-        $this->authorizeEventAccess($event, 'manageMembers');
+        $this->authorizeEventAccess($event, 'members');
 
         $member = User::query()->findOrFail($user);
 

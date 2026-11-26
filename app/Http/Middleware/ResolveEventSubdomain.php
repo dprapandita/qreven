@@ -6,7 +6,6 @@ use App\Enums\EventStatus;
 use App\Models\Event;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class ResolveEventSubdomain
@@ -32,7 +31,7 @@ class ResolveEventSubdomain
         if ($event->status !== EventStatus::Published) {
             $user = $request->user();
 
-            if ($user === null || Gate::forUser($user)->denies('view', $event)) {
+            if ($user === null || ! $event->isAccessibleBy($user)) {
                 abort(404);
             }
         }

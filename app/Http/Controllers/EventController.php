@@ -6,7 +6,6 @@ use App\Enums\EventStatus;
 use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -37,8 +36,6 @@ class EventController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        Gate::authorize('create', Event::class);
-
         $request->merge([
             'subdomain' => Str::slug((string) $request->input('subdomain')),
         ]);
@@ -57,7 +54,7 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event): RedirectResponse
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
 
         $request->merge([
             'subdomain' => Str::slug((string) $request->input('subdomain')),
@@ -103,5 +100,15 @@ class EventController extends Controller
             'timezone' => ['nullable', 'timezone'],
             'status' => ['nullable', Rule::enum(EventStatus::class)],
         ];
+    }
+
+    public function create()
+    {
+        return view('events.create');
+    }
+
+    public function edit(Event $event)
+    {
+        return view('events.edit', compact('event'));
     }
 }

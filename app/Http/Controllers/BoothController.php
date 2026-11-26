@@ -3,24 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BoothStatus;
-use App\Models\Booth;
 use App\Models\Event;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class BoothController extends Controller
 {
-    public function index(Event $event): Collection
+    public function index(Request $request, Event $event): View|JsonResponse
     {
         $this->authorizeEventAccess($event, 'view');
 
-        return $event->booths()->orderBy('nama_booth')->get();
+        $booths = $event->booths()->orderBy('nama_booth')->get();
+
+        if ($request->expectsJson()) {
+            return response()->json($booths);
+        }
+
+        return view('booths.index', compact('event', 'booths'));
     }
 
-    public function store(Request $request, Event $event): Booth
+    public function create(Event $event): View
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
+
+        return view('booths.create', compact('event'));
+    }
+
+    public function store(Request $request, Event $event): RedirectResponse
+    {
+        $this->authorizeEventAccess($event, 'manage');
 
         $data = $request->validate([
             'nama_booth' => ['required', 'string', 'max:255'],
@@ -28,17 +41,33 @@ class BoothController extends Controller
             'harga' => ['required', 'numeric', 'min:0'],
         ]);
 
-        return $event->booths()->create([
+        $event->booths()->create([
             'nama_booth' => $data['nama_booth'],
             'deskripsi' => $data['deskripsi'] ?? null,
             'harga' => $data['harga'],
             'status' => BoothStatus::Available->value,
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Booth berhasil ditambahkan'], 201);
+        }
+
+        return redirect()->route('booths.index', $event)
+            ->with('success', 'Booth berhasil ditambahkan');
     }
 
-    public function update(Request $request, Event $event, string $booth): Booth
+    public function edit(Event $event, string $booth): View
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
+
+        $booth = $event->booths()->findOrFail($booth);
+
+        return view('booths.edit', compact('event', 'booth'));
+    }
+
+    public function update(Request $request, Event $event, string $booth): RedirectResponse
+    {
+        $this->authorizeEventAccess($event, 'manage');
 
         $booth = $event->booths()->findOrFail($booth);
 
@@ -50,12 +79,17 @@ class BoothController extends Controller
 
         $booth->update($data);
 
-        return $booth;
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Booth berhasil diperbarui']);
+        }
+
+        return redirect()->route('booths.index', $event)
+            ->with('success', 'Booth berhasil diperbarui');
     }
 
-    public function destroy(Event $event, string $booth): JsonResponse
+    public function destroy(Request $request, Event $event, string $booth): RedirectResponse|JsonResponse
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
 
         $booth = $event->booths()->findOrFail($booth);
 
@@ -63,8 +97,11 @@ class BoothController extends Controller
 
         $booth->delete();
 
-        return response()->json([
-            'message' => 'Booth berhasil dihapus',
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Booth berhasil dihapus']);
+        }
+
+        return redirect()->route('booths.index', $event)
+            ->with('success', 'Booth berhasil dihapus');
     }
 }

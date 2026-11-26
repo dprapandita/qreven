@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
 
-it('enforces the event permission matrix', function () {
+it('enforces simple event access rules', function () {
     $owner = User::factory()->create();
     $administrator = User::factory()->create();
     $finance = User::factory()->create();
@@ -20,39 +20,34 @@ it('enforces the event permission matrix', function () {
     $event->members()->attach($finance->id, ['role' => EventRole::Finance->value]);
     $event->members()->attach($checkIn->id, ['role' => EventRole::CheckIn->value]);
 
-    expect($owner->can('view', $event))->toBeTrue()
-        ->and($administrator->can('view', $event))->toBeTrue()
-        ->and($finance->can('view', $event))->toBeTrue()
-        ->and($checkIn->can('view', $event))->toBeTrue()
-        ->and($stranger->can('view', $event))->toBeFalse();
+    expect($event->isAccessibleBy($owner))->toBeTrue()
+        ->and($event->isAccessibleBy($administrator))->toBeTrue()
+        ->and($event->isAccessibleBy($finance))->toBeTrue()
+        ->and($event->isAccessibleBy($checkIn))->toBeTrue()
+        ->and($event->isAccessibleBy($stranger))->toBeFalse();
 
-    expect($owner->can('update', $event))->toBeTrue()
-        ->and($administrator->can('update', $event))->toBeTrue()
-        ->and($finance->can('update', $event))->toBeFalse()
-        ->and($checkIn->can('update', $event))->toBeFalse()
-        ->and($stranger->can('update', $event))->toBeFalse();
+    expect($event->canBeManagedBy($owner))->toBeTrue()
+        ->and($event->canBeManagedBy($administrator))->toBeTrue()
+        ->and($event->canBeManagedBy($finance))->toBeFalse()
+        ->and($event->canBeManagedBy($checkIn))->toBeFalse()
+        ->and($event->canBeManagedBy($stranger))->toBeFalse();
 
-    expect($owner->can('delete', $event))->toBeTrue()
-        ->and($administrator->can('delete', $event))->toBeFalse()
-        ->and($finance->can('delete', $event))->toBeFalse();
+    expect($event->isOwnedBy($owner))->toBeTrue()
+        ->and($event->isOwnedBy($administrator))->toBeFalse()
+        ->and($event->isOwnedBy($finance))->toBeFalse();
 
-    expect($owner->can('manageMembers', $event))->toBeTrue()
-        ->and($administrator->can('manageMembers', $event))->toBeFalse();
+    expect($event->canManageMembersBy($owner))->toBeTrue()
+        ->and($event->canManageMembersBy($administrator))->toBeFalse();
 
-    expect($owner->can('viewOrders', $event))->toBeTrue()
-        ->and($administrator->can('viewOrders', $event))->toBeTrue()
-        ->and($finance->can('viewOrders', $event))->toBeTrue()
-        ->and($checkIn->can('viewOrders', $event))->toBeFalse()
-        ->and($stranger->can('viewOrders', $event))->toBeFalse();
+    expect($event->canManageOrdersBy($owner))->toBeTrue()
+        ->and($event->canManageOrdersBy($administrator))->toBeTrue()
+        ->and($event->canManageOrdersBy($finance))->toBeTrue()
+        ->and($event->canManageOrdersBy($checkIn))->toBeFalse()
+        ->and($event->canManageOrdersBy($stranger))->toBeFalse();
 
-    expect($owner->can('manageOrders', $event))->toBeTrue()
-        ->and($administrator->can('manageOrders', $event))->toBeFalse()
-        ->and($finance->can('manageOrders', $event))->toBeTrue()
-        ->and($checkIn->can('manageOrders', $event))->toBeFalse();
-
-    expect($owner->can('checkIn', $event))->toBeTrue()
-        ->and($administrator->can('checkIn', $event))->toBeTrue()
-        ->and($finance->can('checkIn', $event))->toBeFalse()
-        ->and($checkIn->can('checkIn', $event))->toBeTrue()
-        ->and($stranger->can('checkIn', $event))->toBeFalse();
+    expect($event->canCheckInBy($owner))->toBeTrue()
+        ->and($event->canCheckInBy($administrator))->toBeTrue()
+        ->and($event->canCheckInBy($finance))->toBeFalse()
+        ->and($event->canCheckInBy($checkIn))->toBeTrue()
+        ->and($event->canCheckInBy($stranger))->toBeFalse();
 });

@@ -89,4 +89,32 @@ class Event extends Model
 
         return $query->exists();
     }
+
+    public function isAccessibleBy(User $user): bool
+    {
+        return $this->isOwnedBy($user) || $this->hasMemberWithRole($user);
+    }
+
+    public function canBeManagedBy(User $user): bool
+    {
+        return $this->isOwnedBy($user)
+            || $this->hasMemberWithRole($user, [EventRole::Administrator]);
+    }
+
+    public function canManageOrdersBy(User $user): bool
+    {
+        return $this->isOwnedBy($user)
+            || $this->hasMemberWithRole($user, [EventRole::Administrator, EventRole::Finance]);
+    }
+
+    public function canCheckInBy(User $user): bool
+    {
+        return $this->isOwnedBy($user)
+            || $this->hasMemberWithRole($user, [EventRole::Administrator, EventRole::CheckIn]);
+    }
+
+    public function canManageMembersBy(User $user): bool
+    {
+        return $this->isOwnedBy($user);
+    }
 }

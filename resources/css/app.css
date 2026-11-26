@@ -1,47 +1,78 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 
-    /* Electric Violet Theme */
-    --color-qr-bg: #0B0B14;
-    --color-qr-surface: #14142B;
-    --color-qr-card: #1E1E3A;
-    --color-qr-border: #252545;
-    --color-qr-accent: #8B5CF6;
-    --color-qr-accent-light: #A78BFA;
-    --color-qr-accent-dark: #7C3AED;
-    --color-qr-accent-glow: #8B5CF620;
-    --color-qr-text: #FFFFFF;
-    --color-qr-muted: #9CA3AF;
-    --color-qr-success: #10B981;
-    --color-qr-warning: #F59E0B;
-    --color-qr-danger: #EF4444;
-    --color-qr-info: #3B82F6;
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #4c1d95;
+  --color-brand-950: #2e1065;
+
+  --color-accent-400: #e879f9;
+  --color-accent-500: #d946ef;
+
+  --shadow-soft: 0 12px 32px -14px rgb(124 58 237 / 0.35);
 }
 
 @layer base {
-    body {
-        background-color: var(--color-qr-bg);
-        color: var(--color-qr-text);
-    }
+  html { scroll-behavior: smooth; }
+  body { @apply bg-brand-50/40 text-slate-800 antialiased; }
+  ::selection { @apply bg-brand-200 text-brand-950; }
+}
 
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-        width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-        background: var(--color-qr-bg);
-    }
-    ::-webkit-scrollbar-thumb {
-        background: var(--color-qr-border);
-        border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: var(--color-qr-accent);
-    }
+@layer components {
+  /* ---------- Buttons ---------- */
+  .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
+           focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-200 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary   { @apply bg-brand-600 text-white shadow-sm shadow-brand-600/30 hover:bg-brand-700 active:bg-brand-800; }
+  .btn-secondary { @apply border border-brand-200 bg-white text-brand-700 hover:bg-brand-50; }
+  .btn-danger    { @apply bg-rose-600 text-white hover:bg-rose-700; }
+  .btn-ghost     { @apply text-brand-700 hover:bg-brand-100/70; }
+  .btn-sm        { @apply rounded-lg px-3 py-1.5 text-xs; }
+
+  /* ---------- Surfaces ---------- */
+  .card     { @apply rounded-2xl border border-brand-100 bg-white shadow-sm shadow-brand-900/5; }
+  .card-pad { @apply p-5 sm:p-6; }
+
+  /* ---------- Forms ---------- */
+  .input {
+    @apply block w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400
+           transition focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-100;
+  }
+  .label      { @apply block text-sm font-semibold text-brand-950; }
+  .help       { @apply text-xs text-slate-500; }
+  .error-text { @apply text-xs font-medium text-rose-600; }
+
+  /* ---------- Badges ---------- */
+  .badge        { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset; }
+  .badge-purple { @apply bg-brand-50 text-brand-700 ring-brand-200; }
+  .badge-green  { @apply bg-emerald-50 text-emerald-700 ring-emerald-200; }
+  .badge-amber  { @apply bg-amber-50 text-amber-700 ring-amber-200; }
+  .badge-red    { @apply bg-rose-50 text-rose-700 ring-rose-200; }
+  .badge-gray   { @apply bg-slate-100 text-slate-600 ring-slate-200; }
+
+  /* ---------- Table ---------- */
+  .data-table { @apply w-full text-left text-sm; }
+  .data-table thead th { @apply whitespace-nowrap bg-brand-50/70 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-brand-800/70; }
+  .data-table tbody td { @apply border-t border-brand-100/70 px-5 py-4 align-middle; }
+  .data-table tbody tr:hover { @apply bg-brand-50/40; }
+
+  /* ---------- Misc ---------- */
+  .page-title { @apply text-2xl font-extrabold tracking-tight text-brand-950 sm:text-3xl; }
+  .gradient-brand { background-image: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-800) 55%, var(--color-brand-950)); }
+  .gradient-text { @apply bg-clip-text text-transparent; background-image: linear-gradient(90deg, var(--color-brand-600), var(--color-accent-500)); }
 }

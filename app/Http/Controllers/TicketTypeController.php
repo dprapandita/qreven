@@ -4,23 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Enums\TicketStatus;
 use App\Models\Event;
-use App\Models\TicketType;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class TicketTypeController extends Controller
 {
-    public function index(Event $event): Collection
+    public function index(Request $request, Event $event): View|JsonResponse
     {
         $this->authorizeEventAccess($event, 'view');
 
-        return $event->ticketTypes()->orderBy('nama_tiket')->get();
+        $ticketTypes = $event->ticketTypes()->orderBy('nama_tiket')->get();
+
+        if ($request->expectsJson()) {
+            return response()->json($ticketTypes);
+        }
+
+        return view('ticket-types.index', compact('event', 'ticketTypes'));
     }
 
-    public function store(Request $request, Event $event): TicketType
+    public function create(Event $event): View
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
+
+        return view('ticket-types.create', compact('event'));
+    }
+
+    public function store(Request $request, Event $event): RedirectResponse
+    {
+        $this->authorizeEventAccess($event, 'manage');
 
         $data = $request->validate([
             'nama_tiket' => ['required', 'string', 'max:255'],
@@ -29,19 +42,33 @@ class TicketTypeController extends Controller
             'capacity' => ['nullable', 'integer', 'min:1', 'gte:kuota'],
         ]);
 
-        $capacity = $data['capacity'] ?? $data['kuota'];
-
-        return $event->ticketTypes()->create([
+        $event->ticketTypes()->create([
             'nama_tiket' => $data['nama_tiket'],
             'harga' => $data['harga'],
             'kuota' => $data['kuota'],
-            'capacity' => $capacity,
+            'capacity' => $data['capacity'] ?? $data['kuota'],
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Jenis tiket berhasil ditambahkan'], 201);
+        }
+
+        return redirect()->route('ticket-types.index', $event)
+            ->with('success', 'Jenis tiket berhasil ditambahkan');
     }
 
-    public function update(Request $request, Event $event, string $ticketType): TicketType
+    public function edit(Event $event, string $ticketType): View
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
+
+        $ticketType = $event->ticketTypes()->findOrFail($ticketType);
+
+        return view('ticket-types.edit', compact('event', 'ticketType'));
+    }
+
+    public function update(Request $request, Event $event, string $ticketType): RedirectResponse
+    {
+        $this->authorizeEventAccess($event, 'manage');
 
         $ticketType = $event->ticketTypes()->findOrFail($ticketType);
 
@@ -61,17 +88,25 @@ class TicketTypeController extends Controller
 
         $ticketType->update($data);
 
-        return $ticketType;
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Jenis tiket berhasil diperbarui']);
+        }
+
+        return redirect()->route('ticket-types.index', $event)
+            ->with('success', 'Jenis tiket berhasil diperbarui');
     }
 
-    public function destroy(Event $event, string $ticketType): JsonResponse
+    public function destroy(Request $request, Event $event, string $ticketType): RedirectResponse|JsonResponse
     {
-        $this->authorizeEventAccess($event, 'update');
+        $this->authorizeEventAccess($event, 'manage');
 
         $event->ticketTypes()->findOrFail($ticketType)->delete();
 
-        return response()->json([
-            'message' => 'Jenis tiket berhasil dihapus',
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Jenis tiket berhasil dihapus']);
+        }
+
+        return redirect()->route('ticket-types.index', $event)
+            ->with('success', 'Jenis tiket berhasil dihapus');
     }
 }
