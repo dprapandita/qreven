@@ -84,12 +84,3 @@ Daftarkan URL callback yang sama pada pengaturan OAuth Google dan GitHub.
 - `resources/views` — halaman Blade.
 - `routes/web.php` — route web yang aktif.
 
-# Teknis penjalanan docker
-```
-docker compose up -d --build # menjalankan
-```
-### Restart container/service
-```
-docker compose down
-docker compose up -d --build
-```
