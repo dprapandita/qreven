@@ -163,7 +163,7 @@ return [
             return null;
         }
 
-        return $baseDomain === 'localhost' ? 'localhost' : '.'.$baseDomain;
+        return $baseDomain === 'localhost' ? null : '.'.$baseDomain;
     })(),
 
     /*
