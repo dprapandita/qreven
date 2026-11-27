@@ -1,78 +1,191 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --color-brand-50: #f5f3ff;
-  --color-brand-100: #ede9fe;
-  --color-brand-200: #ddd6fe;
-  --color-brand-300: #c4b5fd;
-  --color-brand-400: #a78bfa;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-brand-700: #6d28d9;
-  --color-brand-800: #5b21b6;
-  --color-brand-900: #4c1d95;
-  --color-brand-950: #2e1065;
+  --color-canvas: #F5F3ED;
+  --color-surface: #FFFFFF;
+  --color-ink: #191B18;
+  --color-muted: #696C65;
+  --color-accent: #D9F478;
+  --color-accent-hover: #CBEB5B;
+  --color-teal: #0F766E;
+  --color-line: #D8D8CF;
+  --color-success: #287A48;
+  --color-warning: #946200;
+  --color-error: #B42318;
+}
 
-  --color-accent-400: #e879f9;
-  --color-accent-500: #d946ef;
+:root {
+  color-scheme: light;
+}
 
-  --shadow-soft: 0 12px 32px -14px rgb(124 58 237 / 0.35);
+html.dark {
+  color-scheme: dark;
+  --color-canvas: #121411;
+  --color-surface: #1A1D18;
+  --color-ink: #F2F1EC;
+  --color-muted: #9FA39A;
+  --color-accent: #D9F478;
+  --color-accent-hover: #E3F896;
+  --color-teal: #5EEAD4;
+  --color-line: #2C3028;
+  --color-success: #4ADE80;
+  --color-warning: #FBBF24;
+  --color-error: #F87171;
 }
 
 @layer base {
-  html { scroll-behavior: smooth; }
-  body { @apply bg-brand-50/40 text-slate-800 antialiased; }
-  ::selection { @apply bg-brand-200 text-brand-950; }
+  html {
+    scroll-behavior: smooth;
+    color: var(--color-ink);
+    background-color: var(--color-canvas);
+  }
+  body {
+    @apply bg-canvas text-ink font-sans antialiased transition-colors duration-150;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+  ::selection {
+    background-color: var(--color-accent);
+    color: #191B18;
+  }
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
 }
 
 @layer components {
-  /* ---------- Buttons ---------- */
-  .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
-           focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-200 disabled:cursor-not-allowed disabled:opacity-50;
+  /* ---------- Typography ---------- */
+  .font-display {
+    font-family: var(--font-display);
   }
-  .btn-primary   { @apply bg-brand-600 text-white shadow-sm shadow-brand-600/30 hover:bg-brand-700 active:bg-brand-800; }
-  .btn-secondary { @apply border border-brand-200 bg-white text-brand-700 hover:bg-brand-50; }
-  .btn-danger    { @apply bg-rose-600 text-white hover:bg-rose-700; }
-  .btn-ghost     { @apply text-brand-700 hover:bg-brand-100/70; }
-  .btn-sm        { @apply rounded-lg px-3 py-1.5 text-xs; }
+  .page-title {
+    @apply font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl;
+  }
+  .eyebrow {
+    @apply font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-teal;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn, .btn-primary, .btn-secondary, .btn-accent, .btn-danger, .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply border border-ink bg-ink text-surface hover:bg-ink/90;
+  }
+  .btn-accent {
+    border: 1px solid #191B18;
+    background-color: var(--color-accent);
+    color: #191B18;
+    font-weight: 600;
+    box-shadow: 2px 2px 0 #191B18;
+  }
+  .btn-accent:hover {
+    background-color: var(--color-accent-hover);
+  }
+  html.dark .btn-accent {
+    border-color: var(--color-accent);
+    box-shadow: 2px 2px 0 rgba(217, 244, 120, 0.35);
+  }
+  .btn-secondary {
+    @apply border border-line bg-surface text-ink hover:border-ink/40 hover:bg-canvas;
+  }
+  .btn-danger {
+    @apply border border-error bg-error text-white hover:bg-error/90;
+  }
+  .btn-ghost {
+    @apply text-ink hover:bg-line/40;
+  }
+  .btn-sm {
+    @apply rounded px-3 py-1.5 text-xs;
+  }
 
   /* ---------- Surfaces ---------- */
-  .card     { @apply rounded-2xl border border-brand-100 bg-white shadow-sm shadow-brand-900/5; }
-  .card-pad { @apply p-5 sm:p-6; }
+  .card {
+    @apply rounded-md border border-line bg-surface;
+  }
+  .card-pad {
+    @apply p-5 sm:p-6;
+  }
+  .card-brutal {
+    @apply rounded-md border border-ink bg-surface shadow-[3px_3px_0_var(--color-ink)];
+  }
+  .panel-dark {
+    background-color: #191B18;
+    color: #F5F3ED;
+    border-color: #2C3028;
+  }
+  html.dark .panel-dark {
+    background-color: #1E221B;
+    color: #F2F1EC;
+    border-color: #32372E;
+  }
 
   /* ---------- Forms ---------- */
   .input {
-    @apply block w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400
-           transition focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-100;
+    @apply block w-full rounded-md border border-line bg-surface px-3.5 py-2 text-sm text-ink placeholder:text-muted/70
+           transition-colors duration-150 focus:border-ink focus:outline-none;
   }
-  .label      { @apply block text-sm font-semibold text-brand-950; }
-  .help       { @apply text-xs text-slate-500; }
-  .error-text { @apply text-xs font-medium text-rose-600; }
+  .label {
+    @apply block text-xs font-semibold uppercase tracking-wider text-ink;
+  }
+  .help {
+    @apply text-xs text-muted;
+  }
+  .error-text {
+    @apply text-xs font-medium text-error;
+  }
 
   /* ---------- Badges ---------- */
-  .badge        { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset; }
-  .badge-purple { @apply bg-brand-50 text-brand-700 ring-brand-200; }
-  .badge-green  { @apply bg-emerald-50 text-emerald-700 ring-emerald-200; }
-  .badge-amber  { @apply bg-amber-50 text-amber-700 ring-amber-200; }
-  .badge-red    { @apply bg-rose-50 text-rose-700 ring-rose-200; }
-  .badge-gray   { @apply bg-slate-100 text-slate-600 ring-slate-200; }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider border;
+  }
+  .badge-green {
+    @apply border-success/35 bg-success/12 text-success;
+  }
+  .badge-amber {
+    @apply border-warning/35 bg-warning/12 text-warning;
+  }
+  .badge-red {
+    @apply border-error/35 bg-error/12 text-error;
+  }
+  .badge-gray {
+    @apply border-line bg-canvas text-muted;
+  }
+  .badge-accent {
+    border-color: #191B18;
+    background-color: var(--color-accent);
+    color: #191B18;
+  }
 
   /* ---------- Table ---------- */
-  .data-table { @apply w-full text-left text-sm; }
-  .data-table thead th { @apply whitespace-nowrap bg-brand-50/70 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-brand-800/70; }
-  .data-table tbody td { @apply border-t border-brand-100/70 px-5 py-4 align-middle; }
-  .data-table tbody tr:hover { @apply bg-brand-50/40; }
-
-  /* ---------- Misc ---------- */
-  .page-title { @apply text-2xl font-extrabold tracking-tight text-brand-950 sm:text-3xl; }
-  .gradient-brand { background-image: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-800) 55%, var(--color-brand-950)); }
-  .gradient-text { @apply bg-clip-text text-transparent; background-image: linear-gradient(90deg, var(--color-brand-600), var(--color-accent-500)); }
+  .data-table {
+    @apply w-full text-left text-sm;
+  }
+  .data-table thead th {
+    @apply whitespace-nowrap border-b border-line bg-canvas/70 px-5 py-3 font-mono text-[11px] font-semibold uppercase tracking-wider text-muted;
+  }
+  .data-table tbody td {
+    @apply border-t border-line px-5 py-3.5 align-middle;
+  }
+  .data-table tbody tr:hover {
+    @apply bg-canvas/50;
+  }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\EventStatus;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BoothBookingController;
@@ -13,10 +14,23 @@ use App\Http\Controllers\RundownController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\TicketOrderController;
 use App\Http\Controllers\TicketTypeController;
+use App\Models\Event;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 Route::get('/', function () {
-    return view('welcome');
+    $events = collect();
+
+    if (Schema::hasTable('events')) {
+        $events = Event::query()
+            ->where('status', EventStatus::Published->value)
+            ->withMin('ticketTypes', 'harga')
+            ->orderBy('tanggal_mulai')
+            ->limit(6)
+            ->get();
+    }
+
+    return view('welcome', compact('events'));
 });
 
 Route::domain('{event_subdomain}.'.config('events.base_domain'))->group(function () {
@@ -96,6 +110,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/booths/{booth}', [BoothController::class, 'destroy'])->name('booths.destroy');
 
         Route::get('/rundowns/create', [RundownController::class, 'create'])->name('rundowns.create');
+        Route::post('/rundowns/store', [RundownController::class, 'store'])->name('rundowns.store');
         Route::get('/rundowns/{rundown}/edit', [RundownController::class, 'edit'])->name('rundowns.edit');
         Route::get('/rundowns', [RundownController::class, 'index'])->name('rundowns.index');
         Route::post('/rundowns', [RundownController::class, 'store'])->name('rundowns.store');

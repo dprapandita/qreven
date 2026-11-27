@@ -17,13 +17,18 @@ class EventPublicController extends Controller
         return view('events.public.show', compact('event'));
     }
 
-    public function tickets(Request $request): JsonResponse
+    public function tickets(Request $request): View|JsonResponse
     {
         $event = $this->resolveEvent($request);
+        $ticketTypes = $event->ticketTypes()->orderBy('harga')->get();
 
-        return response()->json([
-            'event' => $event->nama_event,
-            'ticket_types' => $event->ticketTypes()->orderBy('harga')->get(),
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'event' => $event->nama_event,
+                'ticket_types' => $ticketTypes,
+            ]);
+        }
+
+        return view('events.public.tickets', compact('event', 'ticketTypes'));
     }
 }

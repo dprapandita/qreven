@@ -7,9 +7,9 @@
 <form method="POST" action="{{ route('events.store') }}" class="card card-pad max-w-3xl">
     @csrf
     @include('events._form')
-    <div class="mt-8 flex justify-end gap-3 border-t border-brand-100 pt-6">
+    <div class="mt-8 flex justify-end gap-3 border-t border-line pt-6">
         <a href="{{ route('events.index') }}" class="btn-secondary">Batal</a>
-        <button type="submit" class="btn-primary">Simpan event</button>
+        <button type="submit" class="btn-accent">Simpan event</button>
     </div>
 </form>
 @endsection

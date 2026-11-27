@@ -7,12 +7,12 @@
         in_array($key, ['pending','waiting','draft','unpaid','review']) => 'badge-amber',
         in_array($key, ['cancelled','canceled','rejected','expired','failed','refunded']) => 'badge-red',
         $key === '' => 'badge-gray',
-        default => 'badge-purple',
+        default => 'badge-accent',
     };
     $labels = [
         'draft' => 'Draft', 'published' => 'Terbit', 'pending' => 'Menunggu', 'paid' => 'Lunas', 'confirmed' => 'Dikonfirmasi',
         'approved' => 'Disetujui', 'rejected' => 'Ditolak', 'cancelled' => 'Dibatalkan', 'canceled' => 'Dibatalkan',
-        'expired' => 'Kedaluwarsa', 'used' => 'Terpakai', 'checked_in' => 'Sudah check-in', 'active' => 'Aktif', 'failed' => 'Gagal',
+        'expired' => 'Kedaluwarsa', 'used' => 'Terpakai', 'checked_in' => 'Check-in', 'active' => 'Aktif', 'failed' => 'Gagal',
     ];
     $label = $labels[$key] ?? ($key === '' ? '—' : ucfirst(str_replace('_', ' ', $key)));
 @endphp

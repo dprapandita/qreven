@@ -1,11 +1,11 @@
 @props(['label', 'value', 'icon' => 'grid', 'hint' => null])
-<div class="card card-pad flex items-start gap-4">
-    <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-100 text-brand-700">
-        <x-icon :name="$icon" class="size-5" />
-    </span>
+<div class="card card-pad flex items-start justify-between gap-4">
     <div class="min-w-0">
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ $label }}</p>
-        <p class="mt-0.5 text-2xl font-extrabold text-brand-950">{{ $value }}</p>
-        @if($hint)<p class="mt-0.5 text-xs text-slate-500">{{ $hint }}</p>@endif
+        <p class="eyebrow">{{ $label }}</p>
+        <p class="font-display mt-2 text-3xl font-bold tracking-tight text-ink">{{ $value }}</p>
+        @if($hint)<p class="mt-1 text-xs text-muted">{{ $hint }}</p>@endif
     </div>
+    <span class="grid size-9 shrink-0 place-items-center rounded border border-teal/25 bg-teal/10 text-teal">
+        <x-icon :name="$icon" class="size-4" />
+    </span>
 </div>

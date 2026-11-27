@@ -63,3 +63,52 @@ it('does not serve reserved subdomains', function () {
 
     $this->get('http://admin.localhost/')->assertNotFound();
 });
+
+it('serves a ticket list page on the event subdomain', function () {
+    $event = Event::factory()->published()->create([
+        'subdomain' => 'acme',
+        'nama_event' => 'Acme Festival',
+    ]);
+
+    $event->ticketTypes()->create([
+        'nama_tiket' => 'Early Bird',
+        'harga' => 100000,
+        'kuota' => 25,
+        'capacity' => 50,
+    ]);
+
+    $event->ticketTypes()->create([
+        'nama_tiket' => 'VIP',
+        'harga' => 250000,
+        'kuota' => 0,
+        'capacity' => 10,
+    ]);
+
+    $this->get('http://acme.localhost/tickets')
+        ->assertOk()
+        ->assertSee('Acme Festival')
+        ->assertSee('Early Bird')
+        ->assertSee('Rp 100.000')
+        ->assertSee('Tersedia')
+        ->assertSee('VIP')
+        ->assertSee('Habis');
+});
+
+it('returns json ticket list when requested on the event subdomain', function () {
+    $event = Event::factory()->published()->create([
+        'subdomain' => 'acme',
+        'nama_event' => 'Acme Festival',
+    ]);
+
+    $event->ticketTypes()->create([
+        'nama_tiket' => 'Reguler',
+        'harga' => 50000,
+        'kuota' => 10,
+        'capacity' => 10,
+    ]);
+
+    $this->getJson('http://acme.localhost/tickets')
+        ->assertOk()
+        ->assertJsonPath('event', 'Acme Festival')
+        ->assertJsonPath('ticket_types.0.nama_tiket', 'Reguler');
+});

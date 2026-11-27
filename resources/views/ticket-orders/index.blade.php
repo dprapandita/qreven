@@ -8,13 +8,13 @@
 
 <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
-        <h2 class="text-lg font-extrabold text-brand-950">Pesanan tiket</h2>
-        <p class="text-sm text-slate-500">Pantau pembelian dan status pembayaran.</p>
+        <h2 class="font-display text-lg font-bold text-ink">Pesanan tiket</h2>
+        <p class="text-sm text-muted">Pantau pembelian dan status pembayaran.</p>
     </div>
-    <div class="inline-flex rounded-xl border border-brand-100 bg-white p-1">
+    <div class="inline-flex rounded-md border border-line bg-surface p-1">
         @foreach($filters as $key => $label)
             <a href="{{ request()->fullUrlWithQuery(['status' => $key === 'all' ? null : $key, 'page' => null]) }}"
-               class="rounded-lg px-3 py-1.5 text-xs font-semibold transition {{ $current === $key ? 'bg-brand-600 text-white' : 'text-slate-600 hover:bg-brand-50' }}">{{ $label }}</a>
+               class="rounded px-3 py-1.5 text-xs font-medium transition-colors duration-150 {{ $current === $key ? 'bg-ink text-surface' : 'text-muted hover:text-ink' }}">{{ $label }}</a>
         @endforeach
     </div>
 </div>
@@ -25,19 +25,18 @@
     @else
         <div class="overflow-x-auto">
             <table class="data-table">
-                <thead><tr><th>Kode</th><th>Pembeli</th><th>Jumlah</th><th>Total</th><th>Status</th><th>Tanggal</th></tr></thead>
+                <thead><tr><th>ID</th><th>Pembeli</th><th>Total</th><th>Status</th><th>Tanggal</th></tr></thead>
                 <tbody>
                 @foreach($ticketOrders as $o)
                     <tr>
-                        <td class="font-mono text-xs font-bold text-brand-700">{{ $o->code ?? '#' . $o->id }}</td>
+                        <td class="font-mono text-xs font-semibold text-ink">#{{ \Illuminate\Support\Str::limit($o->id, 8, '') }}</td>
                         <td>
-                            <p class="font-semibold text-brand-950">{{ $o->buyer_name ?? $o->name ?? '—' }}</p>
-                            <p class="text-xs text-slate-500">{{ $o->buyer_email ?? $o->email ?? '' }}</p>
+                            <p class="font-semibold text-ink">{{ $o->user->name ?? '—' }}</p>
+                            <p class="text-xs text-muted">{{ $o->user->email ?? '' }}</p>
                         </td>
-                        <td>{{ $o->quantity ?? '—' }}</td>
-                        <td class="font-semibold"><x-money :value="$o->total ?? $o->total_price ?? 0" /></td>
-                        <td><x-badge :status="$o->status ?? null" /></td>
-                        <td class="whitespace-nowrap text-slate-500"><x-date :value="$o->created_at ?? null" /></td>
+                        <td class="font-mono text-sm font-semibold text-ink"><x-money :value="$o->total_harga ?? 0" /></td>
+                        <td><x-badge :status="$o->status_pembayaran ?? null" /></td>
+                        <td class="whitespace-nowrap text-xs text-muted"><x-date :value="$o->created_at ?? null" /></td>
                     </tr>
                 @endforeach
                 </tbody>

@@ -2,8 +2,8 @@
 
 @section('event-content')
 <div class="mb-5">
-    <h2 class="text-lg font-extrabold text-brand-950">Pemesanan booth</h2>
-    <p class="text-sm text-slate-500">Pengajuan dari vendor untuk booth di event ini.</p>
+    <h2 class="font-display text-lg font-bold text-ink">Pemesanan booth</h2>
+    <p class="text-sm text-muted">Pengajuan dari vendor untuk booth di event ini.</p>
 </div>
 
 <div class="card overflow-hidden">
@@ -16,11 +16,11 @@
                 <tbody>
                 @foreach($boothBookings as $b)
                     <tr>
-                        <td class="font-bold text-brand-950">{{ $b->booth->name ?? '—' }}</td>
-                        <td class="font-semibold">{{ $b->vendor_name ?? $b->name ?? '—' }}</td>
-                        <td class="text-slate-500">{{ $b->vendor_email ?? $b->email ?? $b->phone ?? '—' }}</td>
+                        <td class="font-display font-bold text-ink">{{ $b->booth->nama_booth ?? '—' }}</td>
+                        <td class="font-semibold text-ink">{{ $b->nama_brand ?? $b->user->name ?? '—' }}</td>
+                        <td class="text-muted">{{ $b->user->email ?? '—' }}</td>
                         <td><x-badge :status="$b->status ?? null" /></td>
-                        <td class="whitespace-nowrap text-slate-500"><x-date :value="$b->created_at ?? null" /></td>
+                        <td class="whitespace-nowrap text-xs text-muted"><x-date :value="$b->created_at ?? null" /></td>
                     </tr>
                 @endforeach
                 </tbody>
